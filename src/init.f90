@@ -14,7 +14,7 @@ contains
         integer                         :: i, j
         real                            :: Bond_Tresh = 2.5
 
-        do i=1,SIZE(Atom_Array)
+        do i=1,SIZE(Atom_Array)-1
             do j=i+1,SIZE(Atom_Array)
                     ! If < bond threshold then we have a bond (Note Rel Distance: Angstrom^2)
                     if(Rel_Distance(Atom_Array(i), Atom_Array(j)) < Bond_Tresh) then
