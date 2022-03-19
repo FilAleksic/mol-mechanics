@@ -1,9 +1,9 @@
 module TypesModule
     implicit none
 
-    PUBLIC :: Atom
+    PUBLIC :: Atom, ABCD, pnt
     PRIVATE
-    
+
     type pnt
         type(Atom), POINTER :: p
     end type
@@ -13,6 +13,11 @@ module TypesModule
         character(len=1) :: symbol
         type(pnt), DIMENSION(4) :: CBond
         type(pnt) :: HBond
+        type(pnt), ALLOCATABLE :: Bond(:)
+    end type
+
+    type ABCD 
+        type(pnt), DIMENSION(4) :: Atom
     end type
 
     

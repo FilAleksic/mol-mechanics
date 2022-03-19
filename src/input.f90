@@ -20,8 +20,7 @@ contains
             Out_Array(i)%x = x
             Out_Array(i)%y = y
             Out_Array(i)%z = z
-
-            ! Important, set pointers to null, otherwise you get pointers pointing to weird artifacts
+            ! Important, set pointers to null, otherwise you get pointers pointing to weird 
             Out_Array(i)%HBond%p => NULL()
             do j=1,4
                Out_Array(i)%CBond(j)%p => NULL()
