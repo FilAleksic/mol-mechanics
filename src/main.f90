@@ -13,7 +13,6 @@ program prog1
    call Read_File(Input_File, Atoms)
    call Initialize_Atoms(Atoms)
    call Test_Bond(Atoms)
-
    call Test_Array_Pointers(Atoms)
    
 

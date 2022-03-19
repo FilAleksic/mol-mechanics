@@ -11,8 +11,6 @@ module TypesModule
     type Atom
         real*8  :: x, y, z
         character(len=1) :: symbol
-        type(pnt), DIMENSION(4) :: CBond
-        type(pnt) :: HBond
         type(pnt), ALLOCATABLE :: Bond(:)
     end type
 
