@@ -1,7 +1,7 @@
 module TypesModule
     implicit none
 
-    PUBLIC :: Atom, ABCD, pnt
+    PUBLIC :: Atom, Bonding, pnt
     PRIVATE
 
     type pnt
@@ -14,8 +14,10 @@ module TypesModule
         type(pnt), ALLOCATABLE :: Bond(:)
     end type
 
-    type ABCD 
-        type(pnt), DIMENSION(4) :: Atom
+    type Bonding 
+        type(pnt), DIMENSION(4) :: Chain_F
+        type(pnt), DIMENSION(3) :: Chain_T
+        logical                 :: Del = .false.
     end type
 
     

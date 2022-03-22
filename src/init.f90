@@ -27,10 +27,10 @@ contains
 
     subroutine Set_Bond_Pointer(Atom1, Atom2)
         type(Atom), TARGET :: Atom1, Atom2
-        call Push_Back_Bond(Atom1, Atom2)
+        call Push_Back_Atom(Atom1, Atom2)
     end subroutine
 
-    subroutine Push_Back_Bond(Atom1, Bonded)
+    subroutine Push_Back_Atom(Atom1, Bonded)
         type(pnt), ALLOCATABLE :: temp(:)
         type(Atom), TARGET     :: Bonded
         type(Atom), TARGET     :: Atom1
