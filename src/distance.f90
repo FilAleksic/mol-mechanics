@@ -22,4 +22,5 @@ contains
                        (Atom2%y - Atom1%y)**2 + &
                        (Atom2%z - Atom1%z)**2)
     end function
+
 end module

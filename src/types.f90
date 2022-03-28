@@ -6,6 +6,7 @@ module TypesModule
 
     type pnt
         type(Atom), POINTER :: p
+        logical :: Del = .false.
     end type
 
     type Atom
@@ -14,10 +15,9 @@ module TypesModule
         type(pnt), ALLOCATABLE :: Bond(:)
     end type
 
-    type Bonding 
-        type(pnt), DIMENSION(4) :: Chain_F
-        type(pnt), DIMENSION(3) :: Chain_T
-        logical                 :: Del = .false.
+    type Bonding
+        type(pnt), ALLOCATABLE :: Chain_F(:,:)
+        type(pnt), ALLOCATABLE :: Chain_T(:,:)
     end type
 
     
