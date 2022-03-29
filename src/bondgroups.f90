@@ -16,10 +16,10 @@ contains
         end do
 
         if (allocated(BondGroups%Chain_F)) then
-            call RemoveDuplicates(BondGroups%Chain_F, New_Array%Chain_F)
+            call Remove_Duplicates(BondGroups%Chain_F, New_Array%Chain_F)
         end if
         if (allocated(BondGroups%Chain_T)) then
-            call RemoveDuplicates(BondGroups%Chain_T, New_Array%Chain_T)
+            call Remove_Duplicates(BondGroups%Chain_T, New_Array%Chain_T)
         end if
         BondGroups = New_Array
     end subroutine
@@ -77,8 +77,8 @@ contains
         end do 
     end subroutine  
 
-    ! Remove duplicate bondings by checking with the CheckAssociation function
-    subroutine RemoveDuplicates(PointArray, NewArray)
+    ! Remove duplicate bondings by checking with the Check_Association function
+    subroutine Remove_Duplicates(PointArray, NewArray)
         type(pnt), ALLOCATABLE :: NewArray(:,:), Tester(:), temp(:,:)
         type(pnt)              :: PointArray(:,:)
         integer                :: i, j, count=0, szx, szy
@@ -99,7 +99,7 @@ contains
                 end if
                 do j=i+1,szy
                     Tester(:) = PointArray(j,:)
-                    count = CheckAssociation(PointArray(i,:), Tester)
+                    count = Check_Association(PointArray(i,:), Tester)
                     ! If every pointer was matching 1234 = 4321 meaning same link of 4 atoms and can be discarded
                     ! Same for chain of 3 atoms, 123 = 321 so count = 3 when matching
                     if (count == szx) then
@@ -133,16 +133,16 @@ contains
         end if
     end subroutine
 
-    ! Add 1 to CheckAssociation if matching pointer
-    integer function CheckAssociation(a, b)
+    ! Add 1 to Check_Association if matching pointer
+    integer function Check_Association(a, b)
         type(pnt) :: a(:), b(:)
         integer   :: szx, i, j
         szx = SIZE(a)
         j = szx
-        CheckAssociation = 0
+        Check_Association = 0
         do i=1,szx
             if (associated(a(i)%p, b(j)%p)) then
-                CheckAssociation = CheckAssociation + 1
+                Check_Association = Check_Association + 1
             end if
             j = j - 1
         end do

@@ -1,7 +1,6 @@
 module MinimizingModule
     use TypesModule
     use EnergyModule
-    use TestModule
     implicit none
     
     PUBLIC :: Metropolis
@@ -21,19 +20,19 @@ contains
 
         Energy_Out = Energy(Atom_Array, Bonding_Array)
         print*, Energy_Out, 'Starting Energy'
-        do while (lastChange < 5000)
+        do while (lastChange < 100000)
             i = i + 1
-            call NewPositions(Atom_Array, Atoms_New)
-            call Test_Bond(Atoms_New)
+            call New_Positions(Atom_Array, Atoms_New)
             Energy_OutNew = Energy(Atoms_New, Bonding_Array)
             if (Energy_OutNew - Energy_Out < 0) then 
                 if (Energy_OutNew < EnergyMin) then 
                     EnergyMin = Energy_OutNew
                     Atoms_Min = Atoms_New
                     lastChange = 0
+                else
+                    Atom_Array = Atoms_New
+                    Energy_Out = Energy_OutNew
                 end if
-                Atom_Array = Atoms_New
-                Energy_Out = Energy_OutNew
             else if (Accept(Energy_OutNew - Energy_Out)) then
                 Atom_Array = Atoms_New
                 Energy_Out = Energy_OutNew
@@ -43,10 +42,12 @@ contains
         print*, i, 'Iterations'
         print*, EnergyMin, 'Final Energy'
         Atom_Array = Atoms_Min
+        lastChange = 0
+        i = 0
     end subroutine
 
     ! Pick a random atom, move it by a random amount
-    subroutine NewPositions(Old, New)
+    subroutine New_Positions(Old, New)
         type(Atom)              :: Old(:)
         type(Atom), ALLOCATABLE :: New(:)
         integer                 :: sz, j
@@ -73,7 +74,6 @@ contains
             Accept = .true.
         else
             dEnJ = dEnergy * 4184
-            !print*, dEnJ
             pa = exp(-dEnJ /(c%Kb * c%T))
             call random_number(q)
             if (pa > q) then

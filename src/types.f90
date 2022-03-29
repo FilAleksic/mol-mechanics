@@ -41,7 +41,7 @@ module TypesModule
         real*8 :: Avogardro = 6.022140857E23
 
         ! Minimizing parameters
-        real*8 :: T = 297, R = 0.00001, Kb = 1.380649E-23
+        real*8 :: T = 297, R = 0.0001, Kb = 1.380649E-23
     end type
 
     

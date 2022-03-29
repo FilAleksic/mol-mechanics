@@ -8,9 +8,11 @@ program prog1
    implicit none
 
    type(Atom), TARGET, ALLOCATABLE :: Atoms(:)
-   Character(len=*), PARAMETER     :: Input_File = 'c4h10.xyz'
-   type(Bonding) :: Bonding_Info
+   Character(len=*), PARAMETER     :: Input_File = 'ch4.xyz'
+   type(Bonding)                   :: Bonding_Info
+   real                            :: start, finish
 
+   call cpu_time(start)
    ! Read the input file
    call Read_File(Input_File, Atoms)
 
@@ -28,4 +30,7 @@ program prog1
 
    ! Write optimized atom coordinates to Output.txt
    call Write_File('Output.txt', Atoms)
+
+   call cpu_time(finish)
+   print '("Algorithm time = ",f6.3," seconds.")',finish-start
 end program
