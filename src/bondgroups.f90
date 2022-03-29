@@ -2,29 +2,36 @@ module BondGroupModule
     use TypesModule
     implicit none
 
+    PUBLIC :: Group_ABCD
+    PRIVATE
+
 contains
 
     subroutine Group_ABCD(Atom_Array, BondGroups)
         type(Atom), TARGET, INTENT(IN) :: Atom_Array(:)
-        type(Bonding) :: BondGroups, New_Array
-        integer :: i
+        type(Bonding)                  :: BondGroups, New_Array
+        integer                        :: i
         do i=1,SIZE(Atom_Array)
             call Find_Bonding(Atom_Array(i), BondGroups)
         end do
-        call RemoveDuplicates(BondGroups%Chain_F, New_Array%Chain_F)
-        call RemoveDuplicates(BondGroups%Chain_T, New_Array%Chain_T)
 
+        if (allocated(BondGroups%Chain_F)) then
+            call RemoveDuplicates(BondGroups%Chain_F, New_Array%Chain_F)
+        end if
+        if (allocated(BondGroups%Chain_T)) then
+            call RemoveDuplicates(BondGroups%Chain_T, New_Array%Chain_T)
+        end if
         BondGroups = New_Array
     end subroutine
 
     ! Find every 3 and 4 chain starting from a certain atom by iterating over the bonds, and then the bonds of the bonds
     subroutine Find_Bonding(Atom_Array, BondGroups)
         type(Atom), TARGET, INTENT(IN) :: Atom_Array
-        type(Bonding) :: BondGroups
-        type(Bonding) :: temp
-        type(Atom), TARGET :: tempAtom, tempAtom2
-        type(Atom), POINTER :: tempPointer
-        integer :: i, j, k
+        type(Bonding)                  :: BondGroups
+        type(Bonding)                  :: temp
+        type(Atom), TARGET             :: tempAtom, tempAtom2
+        type(Atom), POINTER            :: tempPointer
+        integer                        :: i, j, k
 
         if (.not. allocated(temp%Chain_T)) then
             allocate(temp%Chain_T(1,3))
@@ -70,11 +77,46 @@ contains
         end do 
     end subroutine  
 
+    ! Remove duplicate bondings by checking with the CheckAssociation function
+    subroutine RemoveDuplicates(PointArray, NewArray)
+        type(pnt), ALLOCATABLE :: NewArray(:,:), Tester(:), temp(:,:)
+        type(pnt)              :: PointArray(:,:)
+        integer                :: i, j, count=0, szx, szy
+        
+        szx = SIZE(PointArray(1,:))
+        szy = SIZE(PointArray(:,1))
+        allocate(Tester(szx))
+        allocate(temp(1,szx))
+
+        do i=1,szy
+            if (.not. PointArray(i,1)%Del) then
+                temp(1,1:szx) = PointArray(i,1:szx)
+                ! If first iteration use optional variable with size of row to allocate in push back bonding subroutine
+                if (i==1) then
+                    call Push_Back_Bonding(NewArray, temp, szx)
+                else 
+                    call Push_Back_Bonding(NewArray, temp)
+                end if
+                do j=i+1,szy
+                    Tester(:) = PointArray(j,:)
+                    count = CheckAssociation(PointArray(i,:), Tester)
+                    ! If every pointer was matching 1234 = 4321 meaning same link of 4 atoms and can be discarded
+                    ! Same for chain of 3 atoms, 123 = 321 so count = 3 when matching
+                    if (count == szx) then
+                        PointArray(j,:)%Del = .True.
+                    end if
+                    count = 0
+                end do
+            end if
+        end do
+    end subroutine
+
+    ! Appending Algorithm
     subroutine Push_Back_Bonding(BondGroups, NewValue, sz)
         type(pnt), ALLOCATABLE :: BondGroups(:,:), temp(:,:)
-        type(pnt) :: NewValue(:,:)
-        integer, OPTIONAL :: sz
-        integer :: szx, szy
+        type(pnt)              :: NewValue(:,:)
+        integer, OPTIONAL      :: sz
+        integer                :: szx, szy
 
         if (allocated(BondGroups)) then
             szx = SIZE(BondGroups(1,:))
@@ -91,63 +133,18 @@ contains
         end if
     end subroutine
 
-    ! Remove duplicate bondings by checking with the CheckAssociation function
-    subroutine RemoveDuplicates(PointArray, NewArray)
-        type(pnt) :: PointArray(:,:)
-        type(pnt), ALLOCATABLE :: NewArray(:,:), Tester(:), temp(:,:)
-        integer :: i, j, k, count=0, szx, szy
-
-        szx = SIZE(PointArray(1,:))
-        szy = SIZE(PointArray(:,1))
-        allocate(Tester(szx))
-        allocate(temp(1,szx))
-        do i=1,szy
-            if (.not. PointArray(i,1)%Del) then
-                temp(1,1:szx) = PointArray(i,1:szx)
-                ! If first iteration use optional variable with size of row to allocate in push back bonding subroutine
-                if (i==1) then
-                    call Push_Back_Bonding(NewArray, temp, szx)
-                else 
-                    call Push_Back_Bonding(NewArray, temp)
-                end if
-                do j=i+1,szy
-                    do k=1,szx
-                        Tester(k) = PointArray(j,k)
-                    end do
-                    count = CheckAssociation(PointArray(i,:), Tester)
-                    ! If every pointer was matching 1234 = 4321 meaning same link of 4 atoms and can be discarded
-                    if (count == szx) then
-                        PointArray(j,:)%Del = .True.
-                    end if
-                    count = 0
-                end do
-            end if
-        end do
-    end subroutine
-    
-    subroutine Init_Bonding(BondGroup)
-        type(Bonding) :: BondGroup
-        if (.not. allocated(BondGroup%Chain_T)) then
-            allocate(BondGroup%Chain_T(1,3))
-        end if
-
-        if (.not. allocated(BondGroup%Chain_F)) then
-            allocate(BondGroup%Chain_T(1,4))
-        end if
-    end subroutine
-
     ! Add 1 to CheckAssociation if matching pointer
     integer function CheckAssociation(a, b)
         type(pnt) :: a(:), b(:)
-        integer :: szx, i, j
+        integer   :: szx, i, j
         szx = SIZE(a)
+        j = szx
         CheckAssociation = 0
         do i=1,szx
-            do j=szx,1,-1
-                if (associated(a(i)%p, b(j)%p)) then
-                    CheckAssociation = CheckAssociation + 1
-                end if
-            end do
+            if (associated(a(i)%p, b(j)%p)) then
+                CheckAssociation = CheckAssociation + 1
+            end if
+            j = j - 1
         end do
 
     end function

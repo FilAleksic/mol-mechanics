@@ -11,8 +11,8 @@ contains
     ! Initialize the atom array by reading the file and assigning the pointers of bonds
     subroutine Initialize_Atoms(Atom_Array)
         type(Atom), TARGET :: Atom_Array(:)
-        integer                         :: i, j
-        real                            :: Bond_Tresh = 2.5
+        integer            :: i, j
+        real               :: Bond_Tresh = 2.5
 
         do i=1,SIZE(Atom_Array)-1
             do j=i+1,SIZE(Atom_Array)
@@ -30,6 +30,7 @@ contains
         call Push_Back_Atom(Atom1, Atom2)
     end subroutine
 
+    ! Appending algorithm
     subroutine Push_Back_Atom(Atom1, Bonded)
         type(pnt), ALLOCATABLE :: temp(:)
         type(Atom), TARGET     :: Bonded

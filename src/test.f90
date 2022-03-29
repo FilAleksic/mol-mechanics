@@ -5,7 +5,7 @@ module TestModule
     PUBLIC :: Test_Bond
 contains
 
-   ! Test if all carbons and hydrogens are bonded
+   ! Test if all carbons and hydrogens are properly bonded
    subroutine Test_Bond(Atom_Array)
         type(Atom), INTENT(IN) :: Atom_Array(:)
         integer                :: i
@@ -26,12 +26,10 @@ contains
    subroutine Test_Array_Pointers(Atom_Array)
       type(Atom), INTENT(IN) :: Atom_Array(:)
       integer                :: i, j
-
       do i=1,SIZE(Atom_Array)
          do j=1,SIZE(Atom_Array(i)%Bond)
-            print*, i, Atom_Array(i)%symbol, Atom_Array(i)%Bond(j)%p%symbol, Atom_Array(i)%Bond(j)%p%x
+            print*, i, Atom_Array(i)%symbol, Atom_Array(i)%Bond(j)%p%symbol, Atom_Array(i)%Bond(j)%p%x, Atom_Array(i)%Bond(j)%p%y
          end do
       end do
-
    end subroutine
 end module
